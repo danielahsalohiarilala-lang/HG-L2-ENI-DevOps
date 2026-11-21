@@ -1,16 +1,7 @@
-name: Test Runner
-
-on:
-  workflow_dispatch:
-
+name: Test runner
+on: workflow_dispatch
 jobs:
   test:
     runs-on: self-hosted
     steps:
-      - name: Dire bonjour
-        run: echo "Bonjour, mon runner marche !"
-      - name: Voir la machine
-        run: |
-          whoami
-          pwd
-          ls -la
+      - run: whoami && docker ps
