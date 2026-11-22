@@ -1,0 +1,68 @@
+# Tantara SaaS : environnement de développement
+# Démarrer :  docker compose up -d --build
+name: tantara-saas
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tantara-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3307:3306"   # 3307 sur votre PC, pour ne pas gêner un MySQL/XAMPP déjà installé
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./infra/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  api:
+    build: ./apps/api
+    container_name: tantara-api
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/api:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  adminer:
+    image: adminer:4
+    container_name: tantara-adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  # Outils de collecte : lancé à la demande (docker compose run --rm ai ...)
+  ai:
+    build: ./apps/ai
+    profiles: ["tools"]
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+    working_dir: /apps/ai
+    volumes:
+      - ./apps:/apps
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

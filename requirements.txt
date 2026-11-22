@@ -1,0 +1,12 @@
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0.30,<2.1
+asyncmy>=0.2.9
+pymysql>=1.1
+cryptography>=42
+pydantic-settings>=2.3
+bcrypt>=4.1
+PyJWT>=2.8
+python-multipart>=0.0.9
+email-validator>=2.
+jinja2
