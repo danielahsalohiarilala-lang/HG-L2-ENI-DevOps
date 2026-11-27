@@ -28,9 +28,24 @@ async def api_login(username: str = Form(...), password: str = Form(...)):
     if username:
         return {"access_token": "fake-jwt-token-pfe", "token_type": "bearer"}
     raise HTTPException(status_code=400, detail="Identifiant requis")
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {"message": "Tantara SaaS API", "docs": "/docs"}
+    return """
+    <html>
+      <head><title>Tantara SaaS</title></head>
+      <body style="font-family:Arial; text-align:center; padding:50px; background:#f5f5f5;">
+        <h1 style="color:#6d28d9;">🚀 Tantara SaaS API</h1>
+        <p>Bienvenue sur le projet Tantara - L2 ENI - DevOps</p>
+        <p>✅ Service en ligne en HTTPS</p>
+        <br>
+        <a href="/login" style="background:#6d28d9; color:white; padding:15px 30px; text-decoration:none; border-radius:10px; font-size:18px;">Se connecter →</a>
+        <br><br>
+        <a href="/docs" style="background:white; color:#6d28d9; padding:12px 25px; text-decoration:none; border-radius:10px; border:2px solid #6d28d9;">Voir la Documentation</a>
+        <br><br><br>
+        <p>Déployé sur Render - HTTPS</p>
+      </body>
+    </html>
+    """
 # Route Login
 @app.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page(request: Request):
